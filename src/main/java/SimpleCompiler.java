@@ -110,7 +110,7 @@ public class SimpleCompiler {
      *
      * @return the compiled instruction as a string
      */
-    private static String compileInstruction(String instruction) {
+    private static List<String> compileInstruction(String instruction) {
 
         /*
         first we must parse which instruction this is, then call the relevant method to compile that instruction
@@ -137,7 +137,9 @@ public class SimpleCompiler {
      *
      * @return the compiled println instruction
      */
-    private static String compilePrintln(String instruction) {
+    private static List<String> compilePrintln(String instruction) {
+
+        List<String> compiledInstructions = new ArrayList<>();
 
         //finding the bounds of the print instruction
         int start = instruction.indexOf("(");
@@ -145,6 +147,7 @@ public class SimpleCompiler {
 
         //checking if the bounds of the instruction we found are valid
         if (start != -1 && end != -1 && start < end) {
+
 
             //the current index we're working at
             int index = start + 1;
@@ -155,16 +158,22 @@ public class SimpleCompiler {
             }
 
             //looping through every character in the string to be printed
+            //we need to stop either when we've reached end, or when we've reached the end of the string
             while (index < end && !instruction.substring(index, index+1).equals("\"")) {
 
-                System.out.println("Character: " + instruction.substring(index, index+1));
+                String hexAsciiValue = String.format("0x%02X", (int) instruction.charAt(index));
+                compiledInstructions.add("LDBA " + hexAsciiValue + ", i");
+                compiledInstructions.add("STBA 0xFC16, d");
                 index++;
 
             } //end while
 
         } //end if
 
-        return null;
+        for (String value : compiledInstructions) {
+            System.out.println(value);
+        }
+        return compiledInstructions;
 
     } //end method compilePrintln
 
