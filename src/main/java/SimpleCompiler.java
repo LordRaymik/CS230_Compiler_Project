@@ -1,7 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -53,11 +54,27 @@ public class SimpleCompiler {
         compiledInstructions.add("STOP");
         compiledInstructions.add(".END");
 
-        //DEBUG
+        /*
+        DEBUG
+         */
         //printing the final list of instructions
         for (String instruction : compiledInstructions) {
             System.out.println(instruction);
         } //end for each loop
+
+        //writing our results to a file
+        String fileName = "compilerOutput_Assembly.txt"; //the name of the output file
+        String outputDirectory = "./outputs/"; //the directory the output file will be written to
+        File directory = new File(outputDirectory); //turning these file specifications into a file object
+
+        //if the directory we specified does not exist, then we must create it
+        if (!directory.exists()) {
+            //creating a new directory based on the specifications above
+            directory.mkdir();
+        }
+
+        //writing the list of compiled assembly instructions to a file
+        writeInstructionListToFile(compiledInstructions, outputDirectory, fileName);
 
     } //end method compile
 
@@ -117,6 +134,7 @@ public class SimpleCompiler {
                 String stringToPrint = instruction.substring(stringStart + 1, stringEnd);
                 System.out.println(stringToPrint);
                 compiledInstructions.addAll(compilePrintStringInstructions(stringToPrint));
+                compiledInstructions.addAll(compilePrintCharacterInstructions('\n'));
 
             } //end if
 
@@ -190,7 +208,7 @@ public class SimpleCompiler {
      *
      * @return the {@link File} that stores the program's input
      */
-    private static List<String> parseInstructionListFromFile(String filePath) {
+    public static List<String> parseInstructionListFromFile(String filePath) {
 
         //the final list of commands as strings
         List<String> commandList = new ArrayList<>();
@@ -236,6 +254,43 @@ public class SimpleCompiler {
         } //end exception handling
 
     } //end method parseInstructionListFromFile
+
+
+    /**
+     * Writes the provided list of instructions to a file based on the provided directory and name
+     *
+     * @param outputDirectory the directory the output file will be written to
+     * @param fileName the name of the file that will store the instructions from the provided list
+     *
+     */
+    public static void writeInstructionListToFile(List<String> instructionList, String outputDirectory, String fileName) {
+
+        //attempting to write the given list to a file
+        try {
+
+            //the writer which will be used to write our list as a file in the specified directory and file
+            FileWriter writer = new FileWriter(outputDirectory + "/" + fileName);
+
+            //iterating through every instruction in the provided list
+            for (String instruction : instructionList) {
+
+                //writing the current instruction to the file
+                writer.write(instruction + "\n");
+
+            } //end for each loop
+
+            //closing the writer now that the contents of the file have been written
+            writer.close();
+
+        }
+        //catching an exception if something happened with the IO
+        catch (IOException exception) {
+
+            System.out.println(exception);
+
+        } //end exception handling
+
+    } //end method writeToFile
 
 
 } //end class
