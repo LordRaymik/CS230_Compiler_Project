@@ -36,9 +36,16 @@ public class SimpleCompiler {
     public static void compile(String inputFilePath) {
 
         //getting the inputs for the compiler program
-        List<String> commandList = parseCommandListFromFile(inputFilePath);
+        List<String> instructionList = parseInstructionListFromFile(inputFilePath);
 
-    }
+        //iterating through the list of instructions and compiling each one
+        for (String instruction : instructionList) {
+
+            compileInstruction(instruction);
+
+        }
+
+    } //end method compile
 
 
     /**
@@ -48,7 +55,7 @@ public class SimpleCompiler {
      *
      * @return the {@link File} that stores the program's input
      */
-    private static List<String> parseCommandListFromFile(String filePath) {
+    private static List<String> parseInstructionListFromFile(String filePath) {
 
         //the final list of commands as strings
         List<String> commandList = new ArrayList<>();
@@ -93,7 +100,73 @@ public class SimpleCompiler {
 
         } //end exception handling
 
-    } //end method parseCommandListFromFile
+    } //end method parseInstructionListFromFile
+
+
+    /**
+     * method used to compile a single instruction
+     *
+     * @param instruction the instruction being compiled
+     *
+     * @return the compiled instruction as a string
+     */
+    private static String compileInstruction(String instruction) {
+
+        /*
+        first we must parse which instruction this is, then call the relevant method to compile that instruction
+         */
+
+        //first we check if the given instruction is "println"
+        int printlnIndex = instruction.indexOf("println");
+        if (printlnIndex == 0) { //checking if the intructions starts with "println", which would signify its instruction type
+
+            return compilePrintln(instruction);
+
+        } //end if
+
+        return null;
+
+    } //end method compileInstruction
+
+
+    /**
+     *
+     * This method is called under the assumption that the given instruction is "println"
+     *
+     * @param instruction the String containing the instruction
+     *
+     * @return the compiled println instruction
+     */
+    private static String compilePrintln(String instruction) {
+
+        //finding the bounds of the print instruction
+        int start = instruction.indexOf("(");
+        int end = instruction.indexOf(")");
+
+        //checking if the bounds of the instruction we found are valid
+        if (start != -1 && end != -1 && start < end) {
+
+            //the current index we're working at
+            int index = start + 1;
+
+            int stringStart = instruction.indexOf("\"", start);
+            if (stringStart != -1) {
+                index = stringStart + 1;
+            }
+
+            //looping through every character in the string to be printed
+            while (index < end && !instruction.substring(index, index+1).equals("\"")) {
+
+                System.out.println("Character: " + instruction.substring(index, index+1));
+                index++;
+
+            } //end while
+
+        } //end if
+
+        return null;
+
+    } //end method compilePrintln
 
 
 } //end class
