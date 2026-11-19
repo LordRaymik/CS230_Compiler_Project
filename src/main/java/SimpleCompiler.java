@@ -162,9 +162,10 @@ public class SimpleCompiler {
             //we need to stop either when we've reached end, or when we've reached the end of the string
             while (index < end && !instruction.substring(index, index+1).equals("\"")) {
 
-                String hexAsciiValue = characterToHexASCII(instruction.charAt(index));
-                compiledInstructions.add("LDBA " + hexAsciiValue + ", i");
-                compiledInstructions.add("STBA 0xFC16, d");
+                //adding the instructions to print the current character to the list of compiled instructions
+                compiledInstructions.addAll(compilePrintCharacterInstructions(instruction.charAt(index)));
+
+                //incrementing the index
                 index++;
 
             } //end while
@@ -180,6 +181,24 @@ public class SimpleCompiler {
 
 
     /**
+     * This method takes a character and returns a list of properly formatted assembly instructions that will print it out
+     *
+     * @param character the character being printed
+     *
+     * @return the list of instructions needed to print the character
+     */
+    private static List<String> compilePrintCharacterInstructions(char character) {
+
+        List<String> printInstructions = new ArrayList<>();
+
+        printInstructions.add("LDBA " + characterToHexASCII(character) + ", i");
+        printInstructions.add("STBA 0xFC16, d");
+
+        return printInstructions;
+    } //end method compilePrintCharacterInstructions
+
+
+    /**
      * Converts the given character into its hexadecimal ASCII value
      *
      * @param character the character to be converted
@@ -188,7 +207,7 @@ public class SimpleCompiler {
      */
     private static String characterToHexASCII(char character) {
         return "0x" + Integer.toHexString(character);
-    }
+    } //end method characterToHexASCII
 
 
 } //end class
