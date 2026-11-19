@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -38,14 +39,148 @@ public class SimpleCompiler {
         //getting the inputs for the compiler program
         List<String> instructionList = parseInstructionListFromFile(inputFilePath);
 
+        //the final list of compiled instructions
+        List<String> compiledInstructions = new ArrayList<>();
+
         //iterating through the list of instructions and compiling each one
         for (String instruction : instructionList) {
 
-            compileInstruction(instruction);
+            compiledInstructions.addAll(compileInstruction(instruction));
 
-        }
+        } //end for each loop
+
+        //adding the final instructions needed
+        compiledInstructions.add("STOP");
+        compiledInstructions.add(".END");
+
+        //DEBUG
+        //printing the final list of instructions
+        for (String instruction : compiledInstructions) {
+            System.out.println(instruction);
+        } //end for each loop
 
     } //end method compile
+
+
+    /**
+     * method used to compile a single instruction
+     *
+     * @param instruction the instruction being compiled
+     *
+     * @return the compiled instruction as a string
+     */
+    private static List<String> compileInstruction(String instruction) {
+
+        /*
+        first we must parse which instruction this is, then call the relevant method to compile that instruction
+         */
+
+        //first we check if the given instruction is "println"
+        int printlnIndex = instruction.indexOf("println");
+        if (printlnIndex == 0) { //checking if the instructions starts with "println", which would signify its instruction type
+
+            return compilePrintln(instruction);
+
+        } //end if
+
+        return null;
+
+    } //end method compileInstruction
+
+
+    /**
+     *
+     * This method is called under the assumption that the given instruction is "println"
+     *
+     * @param instruction the String containing the instruction
+     *
+     * @return the compiled println instruction
+     */
+    private static List<String> compilePrintln(String instruction) {
+
+        //the list containing each compiled instruction that is derived from the given instruction the method compiles
+        List<String> compiledInstructions = new ArrayList<>();
+
+        //finding the bounds of the print instruction
+        int start = instruction.indexOf("(");
+        int end = instruction.indexOf(")", start + 1);
+
+        //checking if the bounds of the instruction we found are valid
+        if (start != -1 && end != -1 && start < end) {
+
+            int stringStart = instruction.indexOf("\"", start + 1);
+            int stringEnd = instruction.indexOf("\"", stringStart + 1);
+
+            //checking if the bounds of the string are valid
+            if (stringStart != -1 && stringEnd != -1 && stringStart < stringEnd) {
+
+                String stringToPrint = instruction.substring(stringStart + 1, stringEnd);
+                System.out.println(stringToPrint);
+                compiledInstructions.addAll(compilePrintStringInstructions(stringToPrint));
+
+            } //end if
+
+        } //end if
+
+        return compiledInstructions;
+
+    } //end method compilePrintln
+
+
+    /**
+     * This method takes a string and returns the list of properly formatted assembly instructions that will print out each of its characters
+     *
+     * @param stringToPrint the string to be printed
+     *
+     * @return the list of instructions needed to print the provided string
+     */
+    private static List<String> compilePrintStringInstructions(String stringToPrint) {
+
+        //the list of instructions needed to print the provided string
+        List<String> compiledPrintInstructions = new ArrayList<>();
+
+        //iterating through each character in the string that needs to be printed
+        for (int i = 0; i < stringToPrint.length(); i++) {
+
+            //compiling the instructions needed to print the character at position "i" in the string
+            //and adding them to the final list of instructions needed to print the full string
+            compiledPrintInstructions.addAll(compilePrintCharacterInstructions(stringToPrint.charAt(i)));
+
+        } //end for loop
+
+        return compiledPrintInstructions;
+
+    } //end method compilePrintStringInstructions
+
+
+    /**
+     * This method takes a character and returns a list of properly formatted assembly instructions that will print it out
+     *
+     * @param character the character being printed
+     *
+     * @return the list of instructions needed to print the character
+     */
+    private static List<String> compilePrintCharacterInstructions(char character) {
+
+        List<String> printInstructions = new ArrayList<>();
+
+        printInstructions.add("LDBA " + characterToHexASCII(character) + ", i");
+        printInstructions.add("STBA 0xFC16, d");
+
+        return printInstructions;
+    } //end method compilePrintCharacterInstructions
+
+
+    /**
+     * Converts the given character into its hexadecimal ASCII value
+     *
+     * @param character the character to be converted
+     *
+     * @return the hexadecimal ASCII value of the provided character
+     */
+    private static String characterToHexASCII(char character) {
+        return "0x" + Integer.toHexString(character);
+    } //end method characterToHexASCII
 
 
     /**
@@ -101,113 +236,6 @@ public class SimpleCompiler {
         } //end exception handling
 
     } //end method parseInstructionListFromFile
-
-
-    /**
-     * method used to compile a single instruction
-     *
-     * @param instruction the instruction being compiled
-     *
-     * @return the compiled instruction as a string
-     */
-    private static List<String> compileInstruction(String instruction) {
-
-        /*
-        first we must parse which instruction this is, then call the relevant method to compile that instruction
-         */
-
-        //first we check if the given instruction is "println"
-        int printlnIndex = instruction.indexOf("println");
-        if (printlnIndex == 0) { //checking if the instructions starts with "println", which would signify its instruction type
-
-            return compilePrintln(instruction);
-
-        } //end if
-
-        return null;
-
-    } //end method compileInstruction
-
-
-    /**
-     *
-     * This method is called under the assumption that the given instruction is "println"
-     *
-     * @param instruction the String containing the instruction
-     *
-     * @return the compiled println instruction
-     */
-    private static List<String> compilePrintln(String instruction) {
-
-        //the list containing each compiled instruction that is derived from the given instruction the method compiles
-        List<String> compiledInstructions = new ArrayList<>();
-
-        //finding the bounds of the print instruction
-        int start = instruction.indexOf("(");
-        int end = instruction.indexOf(")");
-
-        //checking if the bounds of the instruction we found are valid
-        if (start != -1 && end != -1 && start < end) {
-
-
-            //the current index we're working at
-            int index = start + 1;
-
-            int stringStart = instruction.indexOf("\"", start);
-            if (stringStart != -1) {
-                index = stringStart + 1;
-            }
-
-            //looping through every character in the string to be printed
-            //we need to stop either when we've reached end, or when we've reached the end of the string
-            while (index < end && !instruction.substring(index, index+1).equals("\"")) {
-
-                //adding the instructions to print the current character to the list of compiled instructions
-                compiledInstructions.addAll(compilePrintCharacterInstructions(instruction.charAt(index)));
-
-                //incrementing the index
-                index++;
-
-            } //end while
-
-        } //end if
-
-        for (String value : compiledInstructions) {
-            System.out.println(value);
-        }
-        return compiledInstructions;
-
-    } //end method compilePrintln
-
-
-    /**
-     * This method takes a character and returns a list of properly formatted assembly instructions that will print it out
-     *
-     * @param character the character being printed
-     *
-     * @return the list of instructions needed to print the character
-     */
-    private static List<String> compilePrintCharacterInstructions(char character) {
-
-        List<String> printInstructions = new ArrayList<>();
-
-        printInstructions.add("LDBA " + characterToHexASCII(character) + ", i");
-        printInstructions.add("STBA 0xFC16, d");
-
-        return printInstructions;
-    } //end method compilePrintCharacterInstructions
-
-
-    /**
-     * Converts the given character into its hexadecimal ASCII value
-     *
-     * @param character the character to be converted
-     *
-     * @return the hexadecimal ASCII value of the provided character
-     */
-    private static String characterToHexASCII(char character) {
-        return "0x" + Integer.toHexString(character);
-    } //end method characterToHexASCII
 
 
 } //end class
