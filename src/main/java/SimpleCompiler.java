@@ -22,10 +22,21 @@ public class SimpleCompiler {
         //the filepath for the compiler's input file
         String inputFilePath = "compilerInput.txt";
 
+        compile(inputFilePath);
+
+    }
+
+
+    /**
+     * This is the public method that lets the simple compiler be used <br>
+     * Given a file path, it will compile the text within it
+     *
+     * @param inputFilePath a file path stored as a String
+     */
+    public static void compile(String inputFilePath) {
+
         //getting the inputs for the compiler program
         List<String> commandList = parseCommandListFromFile(inputFilePath);
-
-        System.out.println(commandList);
 
     }
 
@@ -37,7 +48,7 @@ public class SimpleCompiler {
      *
      * @return the {@link File} that stores the program's input
      */
-    public static List<String> parseCommandListFromFile(String filePath) {
+    private static List<String> parseCommandListFromFile(String filePath) {
 
         //the final list of commands as strings
         List<String> commandList = new ArrayList<>();
