@@ -118,7 +118,7 @@ public class SimpleCompiler {
 
         //first we check if the given instruction is "println"
         int printlnIndex = instruction.indexOf("println");
-        if (printlnIndex == 0) { //checking if the intructions starts with "println", which would signify its instruction type
+        if (printlnIndex == 0) { //checking if the instructions starts with "println", which would signify its instruction type
 
             return compilePrintln(instruction);
 
@@ -139,6 +139,7 @@ public class SimpleCompiler {
      */
     private static List<String> compilePrintln(String instruction) {
 
+        //the list containing each compiled instruction that is derived from the given instruction the method compiles
         List<String> compiledInstructions = new ArrayList<>();
 
         //finding the bounds of the print instruction
@@ -161,7 +162,7 @@ public class SimpleCompiler {
             //we need to stop either when we've reached end, or when we've reached the end of the string
             while (index < end && !instruction.substring(index, index+1).equals("\"")) {
 
-                String hexAsciiValue = String.format("0x%02X", (int) instruction.charAt(index));
+                String hexAsciiValue = characterToHexASCII(instruction.charAt(index));
                 compiledInstructions.add("LDBA " + hexAsciiValue + ", i");
                 compiledInstructions.add("STBA 0xFC16, d");
                 index++;
@@ -176,6 +177,18 @@ public class SimpleCompiler {
         return compiledInstructions;
 
     } //end method compilePrintln
+
+
+    /**
+     * Converts the given character into its hexadecimal ASCII value
+     *
+     * @param character the character to be converted
+     *
+     * @return the hexadecimal ASCII value of the provided character
+     */
+    private static String characterToHexASCII(char character) {
+        return "0x" + Integer.toHexString(character);
+    }
 
 
 } //end class
