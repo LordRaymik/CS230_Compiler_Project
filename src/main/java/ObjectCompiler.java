@@ -43,12 +43,21 @@ public class ObjectCompiler {
          */
 
         //first we check if the given instruction is "LDBA"
-        int printlnIndex = instruction.indexOf("LDBA");
-        if (printlnIndex == 0) { //checking if the instructions starts with "LDBA", which would signify its instruction type
+        if (instruction.indexOf("LDBA") == 0) { //checking if the instructions starts with "LDBA", which would signify its instruction type
 
             return compileLDBA(instruction);
 
-        } //end if
+        }
+        //checking if the given instruction is "STBA"
+        else if (instruction.indexOf("STBA") == 0) { //checking if the instructions starts with "STBA", which would signify its instruction type
+
+            return compileSTBA(instruction);
+
+        } else if (instruction.indexOf("STOP") == 0) {
+
+            return compileSTOP(instruction);
+
+        } //end else if
 
         return List.of();
 
@@ -75,10 +84,6 @@ public class ObjectCompiler {
 
         //the argument being loaded to the accumulator
         String hexArgument = instruction.substring(hexArgumentIndex, instruction.indexOf(','));
-        //padding the hexadecimal if it is too short so that it's properly formatted
-        while (hexArgument.length() < 4) {
-            hexArgument = "0" + hexArgument;
-        } //end while loop
 
         //breaking up the argument into byte sized blocks before adding them to the object code
         for (int i = 0; i < hexArgument.length() - 1; i = i + 2) {
@@ -86,6 +91,57 @@ public class ObjectCompiler {
             objectCode.add(hexArgument.substring(i, Math.min(hexArgument.length(), i + 2)));
 
         } //end for loop
+
+        return objectCode;
+
+    } //end method compileLDBA
+
+
+    /**
+     * Compiles the assembly instruction STBA into object code
+     *
+     * @param instruction
+     *
+     * @return
+     */
+    private static List<String> compileSTBA(String instruction) {
+
+        List<String> objectCode = new ArrayList<>();
+
+        objectCode.add("F1");
+
+        int hexArgumentIndex = instruction.indexOf("0x");
+        if (hexArgumentIndex != -1) {
+            hexArgumentIndex += 2;
+        } //end if
+
+        //the argument being loaded to the accumulator
+        String hexArgument = instruction.substring(hexArgumentIndex, instruction.indexOf(','));
+
+        //breaking up the argument into byte sized blocks before adding them to the object code
+        for (int i = 0; i < hexArgument.length() - 1; i = i + 2) {
+
+            objectCode.add(hexArgument.substring(i, Math.min(hexArgument.length(), i + 2)));
+
+        } //end for loop
+
+        return objectCode;
+
+    } //end method compileLDBA
+
+
+    /**
+     * Compiles the assembly instruction STOP into object code
+     *
+     * @param instruction
+     *
+     * @return
+     */
+    private static List<String> compileSTOP(String instruction) {
+
+        List<String> objectCode = new ArrayList<>();
+
+        objectCode.add("00");
 
         return objectCode;
 
