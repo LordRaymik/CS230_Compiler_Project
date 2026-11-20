@@ -105,7 +105,6 @@ public class AssemblyCompiler {
 
                 String stringToPrint = instruction.substring(stringStart + 1, stringEnd);
                 compiledInstructions.addAll(compilePrintStringInstructions(stringToPrint));
-                compiledInstructions.addAll(compilePrintCharacterInstructions('\n'));
 
             } //end if
 
@@ -168,7 +167,14 @@ public class AssemblyCompiler {
      * @return the hexadecimal ASCII value of the provided character
      */
     private static String characterToHexASCII(char character) {
-        return "0x" + Integer.toHexString(character);
+
+        String hexString = Integer.toHexString(character);
+        //padding the hexadecimal if it is too short so that it's properly formatted
+        while (hexString.length() < 4) {
+            hexString = "0" + hexString;
+        } //end while loop
+
+        return "0x" + hexString;
     } //end method characterToHexASCII
 
 
