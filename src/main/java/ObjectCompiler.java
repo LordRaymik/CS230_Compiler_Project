@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +27,19 @@ public class ObjectCompiler {
 
         } //end for each loop
 
-        System.out.println(objectCode);
+        //writing our results to a file
+        String fileName = "compilerOutput_Object.txt"; //the name of the output file
+        String outputDirectory = "./outputs/"; //the directory the output file will be written to
+        File directory = new File(outputDirectory); //turning these file specifications into a file object
+
+        //if the directory we specified does not exist, then we must create it
+        if (!directory.exists()) {
+            //creating a new directory based on the specifications above
+            directory.mkdir();
+        }
+
+        //writing the list of compiled assembly instructions to a file
+        writeObjectCodeToFile(objectCode, outputDirectory, fileName);
 
     } //end method compile
 
@@ -146,5 +161,42 @@ public class ObjectCompiler {
         return objectCode;
 
     } //end method compileLDBA
+
+
+    /**
+     * Writes the provided list of object code to a file based on the provided directory and name
+     *
+     * @param outputDirectory the directory the output file will be written to
+     * @param fileName the name of the file that will store the object code from the provided list
+     *
+     */
+    public static void writeObjectCodeToFile(List<String> objectCode, String outputDirectory, String fileName) {
+
+        //attempting to write the given list to a file
+        try {
+
+            //the writer which will be used to write our list as a file in the specified directory and file
+            FileWriter writer = new FileWriter(outputDirectory + "/" + fileName);
+
+            //iterating through every byte of the object code in the provided list
+            for (String objectByte : objectCode) {
+
+                //writing the current byte to the file
+                writer.write(objectByte + " ");
+
+            } //end for each loop
+
+            //closing the writer now that the contents of the file have been written
+            writer.close();
+
+        }
+        //catching an exception if something happened with the IO
+        catch (IOException exception) {
+
+            System.out.println(exception);
+
+        } //end exception handling
+
+    } //end method writeToFile
 
 } //end class
