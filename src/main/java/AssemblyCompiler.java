@@ -178,6 +178,26 @@ public class AssemblyCompiler {
     } //end method characterToHexASCII
 
 
+    private List<String> compileAddition (String instruction) {
+        int additionIndex = instruction.indexOf("+");
+        if (additionIndex ==- 1) {
+            return new ArrayList<>();
+        }
+        String leftHalf = instruction.substring(0, additionIndex);
+        String rightHalf = instruction.substring(additionIndex + 1);
+        int leftvalue= Integer.parseInt(leftHalf,10);
+        int rightvalue= Integer.parseInt(rightHalf,10);
+
+        List<String> additionInstructions = new ArrayList<>();
+
+        additionInstructions.add("LDWA " + leftvalue + ", i");
+        additionInstructions.add("ADDA " + rightvalue + ", i");
+
+        return additionInstructions;
+    }
+
+
+
     /**
      * This functon is used to find and return the input file used in the program
      *
