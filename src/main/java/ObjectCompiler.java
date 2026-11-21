@@ -68,6 +68,14 @@ public class ObjectCompiler {
 
             return compileSTBA(instruction);
 
+        } else if (instruction.indexOf("LDWA") == 0) {
+
+            return compileLDWA(instruction);
+
+        } else if (instruction.indexOf("ADDA") == 0) {
+
+            return compileADDA(instruction);
+
         } else if (instruction.indexOf("STOP") == 0) {
 
             return compileSTOP(instruction);
@@ -142,7 +150,93 @@ public class ObjectCompiler {
 
         return objectCode;
 
-    } //end method compileLDBA
+    } //end method compileSTBA
+
+
+    /**
+     * Compiles the assembly instruction LDWA into object code
+     *
+     * @param instruction
+     *
+     * @return
+     */
+    private static List<String> compileLDWA(String instruction) {
+
+        List<String> objectCode = new ArrayList<>();
+
+        objectCode.add("C0");
+
+        int argumentIndex = instruction.indexOf(" ");
+        if (argumentIndex != -1) {
+            argumentIndex += 1;
+        } //end if
+
+        //the argument being loaded to the accumulator
+        String argument = instruction.substring(argumentIndex, instruction.indexOf(','));
+
+        argument = Integer.toHexString(Integer.parseInt(argument));
+
+        //padding the hexadecimal if it is too short so that it's properly formatted
+        while (argument.length() < 4) {
+            argument = "0" + argument;
+        } //end while loop
+
+        //making sure the hex value isn't too long
+        argument = argument.substring(Math.max(0, argument.length() - 4));
+
+        //breaking up the argument into byte sized blocks before adding them to the object code
+        for (int i = 0; i < argument.length() - 1; i = i + 2) {
+
+            objectCode.add(argument.substring(i, Math.min(argument.length(), i + 2)));
+
+        } //end for loop
+
+        return objectCode;
+
+    } //end method compileLDWA
+
+
+    /**
+     * Compiles the assembly instruction ADDA into object code
+     *
+     * @param instruction
+     *
+     * @return
+     */
+    private static List<String> compileADDA(String instruction) {
+
+        List<String> objectCode = new ArrayList<>();
+
+        objectCode.add("60");
+
+        int argumentIndex = instruction.indexOf(" ");
+        if (argumentIndex != -1) {
+            argumentIndex += 1;
+        } //end if
+
+        //the argument being loaded to the accumulator
+        String argument = instruction.substring(argumentIndex, instruction.indexOf(','));
+
+        argument = Integer.toHexString(Integer.parseInt(argument));
+
+        //padding the hexadecimal if it is too short so that it's properly formatted
+        while (argument.length() < 4) {
+            argument = "0" + argument;
+        } //end while loop
+
+        //making sure the hex value isn't too long
+        argument = argument.substring(Math.max(0, argument.length() - 4));
+
+        //breaking up the argument into byte sized blocks before adding them to the object code
+        for (int i = 0; i < argument.length() - 1; i = i + 2) {
+
+            objectCode.add(argument.substring(i, Math.min(argument.length(), i + 2)));
+
+        } //end for loop
+
+        return objectCode;
+
+    } //end method compileADDA
 
 
     /**
