@@ -65,12 +65,15 @@ public class AssemblyCompiler {
          */
 
         //first we check if the given instruction is "println"
-        int printlnIndex = instruction.indexOf("println");
-        if (printlnIndex == 0) { //checking if the instructions starts with "println", which would signify its instruction type
+        if (instruction.indexOf("println") == 0) { //checking if the instructions starts with "println", which would signify its instruction type
 
             return compilePrintln(instruction);
 
-        } //end if
+        } else if (instruction.indexOf("+") != -1) {
+
+            return compileAddition(instruction);
+
+        }
 
         return List.of();
 
@@ -178,7 +181,7 @@ public class AssemblyCompiler {
     } //end method characterToHexASCII
 
 
-    private List<String> compileAddition (String instruction) {
+    private static List<String> compileAddition (String instruction) {
         int additionIndex = instruction.indexOf("+");
         if (additionIndex ==- 1) {
             return new ArrayList<>();
